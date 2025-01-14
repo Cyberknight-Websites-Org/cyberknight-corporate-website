@@ -1,0 +1,30 @@
+---
+layout: default
+---
+
+<h1>Posts With Tag '{{ page.title | replace: "-", " " }}'</h1>
+
+<div style="height: 1rem;"></div>
+
+{% assign current_year = "" %}
+
+<ul class="post-list-container">
+  {% for post in page.posts %}
+    {% assign post_year = post.date | date: "%Y" %}
+    {% if post_year != current_year and include.show_year %}
+      <h2><a href="/posts/{{ post_year }}">{{ post_year }}</a></h2>
+      {% assign current_year = post_year %}
+    {% endif %}
+    <li class="post-list-item">
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a><br>
+      {{ post.date | date: site.theme_config.date_format }}
+      <ul class="tag-ul">
+        {% assign sorted_tags = post.tags | sort %}
+        {% for tag in sorted_tags %}
+          <a href="/tag/{{ tag }}"><li class="tag">{{ tag | replace: "-", " " }}</li></a>
+        {% endfor %}
+      </ul>
+      <p style="font-style: italic;"> {{ post.description }} </p>
+    </li>
+  {% endfor %}
+</ul>

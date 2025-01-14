@@ -1,0 +1,21 @@
+websites:
+  - title: "Council 2431"
+    url: https://kofc2431.org/
+    description: "The first council to use the services of Cyberknight."
+    status: Active
+    year: "2024"
+
+home:
+  - title: "Council 2431"
+    url: https://kofc2431.org/
+    description: "The first council to use the services of Cyberknight."
+    status: Active
+    year: "2024"
+
+  # - title: McDonald's Screenshot Generator
+  #   url: https://github.com/JLO64/Generate-McDonalds-Mobile-Screenshot
+  #   description: Generates fake McDonald's app order screenshots.
+  #   status: Archived
+  #   year: "2023"
+  #   image: "/assets/images/projects/McDonald_project.svg"
+    

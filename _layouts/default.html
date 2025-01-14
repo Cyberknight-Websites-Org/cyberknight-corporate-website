@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: "en" }}" class="html" data-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+  
+    <link rel="alternate" type="application/atom+xml" title="Domain of a Knight" href="https://www.julianlopez.net/feed.xml" />
+  
+    <meta name="generator" content="Jekyll v4.2.2">
+    <meta name="author" content="{{ site.author }}">
+    {% if page.description %}
+    <meta name="description" content="{{ page.description }}">
+    <meta property="og:description" content="{{ page.description }}">
+    <meta name="twitter:description" content="{{ page.description }}">
+    {% else %}
+    <meta name="description" content="{{ site.description }}">
+    <meta property="og:description" content="{{ site.description }}">
+    <meta name="twitter:description" content="{{ site.description }}">
+    {% endif %}
+    <link rel="canonical" href="{{ page.url }}">
+    <meta property="og:title" content="{{ page.title }}">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="{{ page.url }}">
+    <meta property="og:site_name" content="{{ site.title }}">
+    {% if page.layout == 'post' %}
+    <meta property="og:image" content="{{ site.url }}/assets/opengraph/default-opengraph.png">
+    <meta name="twitter:image" content="{{ site.url }}/assets/opengraph/default-opengraph.png">
+    {% else %}
+    <meta property="og:image"  content="{{ site.url }}/assets/opengraph/default-opengraph.png">
+    <meta name="twitter:image" content="{{ site.url }}/assets/opengraph/default-opengraph.png">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ page.url }}">
+    <meta name="twitter:title" content="{{ page.title }}">
+  
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/images/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/images/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/assets/images/favicon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="msapplication-config" content="/assets/images/favicon/browserconfig.xml">
+    <meta name="theme-color" content="#74c0fc">
+  
+    <!-- Google site verification -->
+    <meta name="google-site-verification" content="VsNyvMxYvOQFM1OyN-DUCMvUDGYbj3xb6ZmPBbkNLYo" />
+  
+    <link rel="stylesheet" href="{{ "/assets/css/main.css" | relative_url }}" />
+    {% if page.layout == 'post' %}
+    <link rel="stylesheet" href="{{ "/assets/css/post.css" | relative_url }}" />
+    {% endif %}
+  
+    {% if page.mermaid %}
+      <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true
+        });
+      </script>
+    {% endif %}
+    
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="Domain of a Knight Feed" href="/feed.xml"/>
+
+    <script>
+      function onNavigateOrLoad() {
+        const url = window.location.href.replace("http://", "").replace("https://", "");
+        console.log(url);
+        const homepage_url = "{{ site.url }}/".replace("http://", "").replace("https://", "");
+      }
+
+      document.addEventListener("DOMContentLoaded", onNavigateOrLoad);
+    </script>
+  </head>
+  <body>
+    {% include space-rings.html %}
+
+    {% include image_dialog.html %}
+    <div class="topbar-container">
+      <div class="topbar">
+        <div class="topbar-top-row">
+          <button id="topbar-lightbulb" class="topbar-button">
+            <img>
+          </button>
+          <a class="topbar-links" href="/">Home</a>
+          <a class="topbar-links" href="/posts">Posts</a>
+          <a class="a-website-title noselect">{{ site.title }}</a>
+          <a class="topbar-links" href="/customers">Customers</a>
+          <a class="topbar-links" href="/about">About</a>
+          <button menu-open id="topbar-menu" class="topbar-button">
+            <img src="/assets/svg/bars.svg">
+          </button>
+          <button id="topbar-radio" class="topbar-button">
+            <img src="/assets/svg/circle-play.svg">
+          </button>
+        </div>
+        <div class="topbar-bottom-row">
+          <a class="topbar-mobile-links" href="/">Home</a>
+          <a class="topbar-mobile-links" href="/posts">Posts</a>
+          <a class="topbar-mobile-links" href="/customers">Customers</a>
+          <a class="topbar-mobile-links" href="/about">About</a>
+        </div>
+      </div>
+    </div>
+    {% include toggle_theme_js.html %}
+    {% include topbar_JS.html %}
+    
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <div class="w-inner">
+          {{ content }}
+        </div>
+      </div>
+    </main>
+    <script>
+      function updateContent(html) {
+        const data = new DOMParser().parseFromString(html, 'text/html');
+        document.documentElement.scrollTop = 0;
+        document.body.querySelector('.w').innerHTML = data.body.querySelector('.w').innerHTML;
+        document.title = data.title;
+        onNavigateOrLoad(); // Add this line to trigger the function after content updates
+      }
+
+      function handleLinkClick(event) {
+        const link = event.target.closest('a');
+        if (!link) return;
+        
+        // Ignore if it's an external link, has a target, or is a download
+        if (
+          !link.href ||
+          link.target ||
+          link.download ||
+          link.href.startsWith('mailto:') ||
+          link.href.startsWith('tel:') ||
+          !link.href.startsWith(window.location.origin)
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+
+        if (!document.startViewTransition) {
+          // Fallback for browsers without view transitions
+          fetch(link.href)
+            .then(response => response.text())
+            .then(html => {
+              updateContent(html);
+              history.pushState({}, '', link.href);
+            });
+          return;
+        }
+
+        // With view transitions
+        document.startViewTransition(async () => {
+          const response = await fetch(link.href);
+          const text = await response.text();
+          history.pushState({}, '', link.href);
+          updateContent(text);
+        });
+      }
+
+      // Handle back/forward navigation
+      window.addEventListener('popstate', async () => {
+        const response = await fetch(window.location.href);
+        const text = await response.text();
+        
+        if (document.startViewTransition) {
+          document.startViewTransition(() => {
+            updateContent(text);
+          });
+        } else {
+          updateContent(text);
+        }
+      });
+
+      // Add click handler to document
+      document.addEventListener('click', handleLinkClick);
+    </script>
+  </body>
+  <script>
+    {% include card_hover.js %}
+  </script>
+
+  <script type="speculationrules">
+    {
+      "prerender": [{
+        "where": {"href_matches": "/*"},
+        "eagerness": "moderate"
+      }]
+    }
+  </script>
+</html>
