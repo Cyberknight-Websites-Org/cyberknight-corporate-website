@@ -18,6 +18,16 @@ a[href*="mailto:"]::before{
     background: url('/assets/svg/envelope.svg') no-repeat center center / contain;
 }
 
+a[href*="tel:"]::before{
+    content: "";
+    display: inline-block;
+    height: 0.9rem; 
+    width: 0.9rem;
+    filter: invert(70%) sepia(8%) saturate(2681%) hue-rotate(174deg) brightness(102%) contrast(98%);    
+    margin-right: 0.2rem;
+    background: url('/assets/svg/phone.svg') no-repeat center center / contain;
+}
+
 p{
     a[href*="feed.xml"]:hover{
         text-shadow: 0 0 1.1rem #F99A39;
