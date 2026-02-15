@@ -513,6 +513,13 @@ a:hover {
   line-height: 1.8;
 }
 
+.post-content img,
+.page-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 .post-meta {
   color: var(--text-secondary);
   font-size: 0.95rem;
