@@ -1,0 +1,28 @@
+---
+layout: page
+title: Blog
+permalink: /blog/
+---
+
+<div class="blog-list">
+  {% for post in site.posts %}
+    <article class="blog-post">
+      <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+      <div class="post-meta">
+        <time datetime="{{ post.date | date_to_xmlschema }}">
+          {{ post.date | date: "%B %-d, %Y" }}
+        </time>
+      </div>
+      <div class="excerpt">
+        {{ post.excerpt }}
+      </div>
+      <a href="{{ post.url | relative_url }}">Read more →</a>
+    </article>
+  {% endfor %}
+
+  {% if site.posts.size == 0 %}
+    <p style="text-align: center; color: var(--text-secondary); padding: 60px 0;">
+      No posts yet. Check back soon!
+    </p>
+  {% endif %}
+</div>

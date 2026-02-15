@@ -1,0 +1,44 @@
+# Site settings
+title: Cyberknight Websites
+email: JulianLopez@cyberknight-websites.com
+description: >-
+  Modern web solutions for Knights of Columbus councils.
+  The pen is mightier than the sword, but modern knights require both modern swords and modern pens.
+baseurl: ""
+url: ""
+
+# Build settings
+markdown: kramdown
+permalink: /blog/:year/:month/:day/:title/
+
+# Collections
+collections:
+  documentation:
+    output: true
+    permalink: /docs/:path/
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - Dockerfile
+  - README.md
+  - .claude/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "documentation"
+    values:
+      layout: "page"
