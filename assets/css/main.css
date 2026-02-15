@@ -513,6 +513,21 @@ a:hover {
   line-height: 1.8;
 }
 
+.page-body ol,
+.page-body ul,
+.post-content ol,
+.post-content ul {
+  margin-bottom: 1rem;
+  padding-left: 2rem;
+}
+
+.page-body ol li,
+.page-body ul li,
+.post-content ol li,
+.post-content ul li {
+  margin-bottom: 0.5rem;
+}
+
 .post-content img,
 .page-body img {
   max-width: 100%;
