@@ -6,7 +6,7 @@
 }
 
 :root {
-  --accent-color: #74c0fc;
+  --accent-color: #3273DC;
   --bg-color: #fafafa;
   --text-color: #1d1d1f;
   --text-secondary: #6e6e73;
@@ -39,7 +39,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #5ba8e6;
+  background: #2861c7;
 }
 
 /* Typography */
@@ -160,7 +160,7 @@ a:hover {
 }
 
 .nav-portal:hover {
-  background-color: #5ba8e6 !important;
+  background-color: #2861c7 !important;
 }
 
 @media (max-width: 968px) {
@@ -408,7 +408,7 @@ a:hover {
 }
 
 .blog-post h2 a:hover {
-  color: #5ba8e6;
+  color: #2861c7;
 }
 
 .blog-post .post-meta {
@@ -566,8 +566,8 @@ a:hover {
 }
 
 .site-footer a:hover {
-  color: #5ba8e6;
-  border-bottom-color: #5ba8e6;
+  color: #2861c7;
+  border-bottom-color: #2861c7;
 }
 
 @media (max-width: 768px) {

@@ -5,7 +5,7 @@ description: >-
   Modern web solutions for Knights of Columbus councils.
   The pen is mightier than the sword, but modern knights require both modern swords and modern pens.
 baseurl: ""
-url: ""
+url: "https://cyberknight-websites.com"
 
 # Build settings
 markdown: kramdown
