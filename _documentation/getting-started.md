@@ -16,7 +16,7 @@ Welcome to your new council website! This guide will walk you through the basic 
 2. Log in with your provided credentials
 3. You'll see your dashboard with all available management tools
 
-![Cyberknight Secure Portal login screen](https://placecats.com/800/500)
+![Cyberknight Secure Portal login screen](/assets/images/docs/getting-started/korone-bg.png)
 *The secure portal provides a centralized dashboard for managing your council website*
 
 ## Creating Your First Event
@@ -29,7 +29,7 @@ Events are a great way to keep your members informed about upcoming council acti
 3. Fill in the event details (title, date, time, location, description)
 4. Click "Publish"
 
-![Event creation interface](https://placecats.com/800/500)
+![Event creation interface](/assets/images/docs/getting-started/korone-bg.png)
 *The event creation form makes it easy to add details and publish to your council website*
 
 Your event will now appear on your public council website!
@@ -45,7 +45,7 @@ Posts allow you to share news and updates with your council members.
 4. Add any images or attachments
 5. Click "Publish"
 
-![Post editor with rich text formatting](https://placecats.com/800/500)
+![Post editor with rich text formatting](/assets/images/docs/getting-started/korone-bg.png)
 *The post editor supports rich text formatting and image uploads*
 
 Posts can be automatically included in your email newsletters.
@@ -54,14 +54,14 @@ Posts can be automatically included in your email newsletters.
 
 The member directory is automatically synced with your member management system, but you can view and update information through the portal.
 
-![Member directory interface](https://placecats.com/800/500)
+![Member directory interface](/assets/images/docs/getting-started/korone-bg.png)
 *View and manage your council member directory with searchable, organized records*
 
 ## Sending Announcements
 
 Announcements can be sent via email and SMS to all subscribed members.
 
-![Announcement creation and preview screen](https://placecats.com/800/500)
+![Announcement creation and preview screen](/assets/images/docs/getting-started/korone-bg.png)
 *Preview your announcements before sending to ensure they look perfect*
 
 **Important:** Always preview your announcement before sending to ensure accuracy.
