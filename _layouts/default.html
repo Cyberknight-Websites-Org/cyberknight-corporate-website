@@ -16,5 +16,51 @@
   </main>
 
   {% include footer.html %}
+
+  <script>
+    // Hamburger menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburger = document.querySelector('.hamburger');
+      const navMenu = document.querySelector('.nav-menu');
+
+      if (hamburger && navMenu) {
+        hamburger.addEventListener('click', function() {
+          hamburger.classList.toggle('active');
+          navMenu.classList.toggle('active');
+
+          // Update aria-expanded for accessibility
+          const isExpanded = hamburger.classList.contains('active');
+          hamburger.setAttribute('aria-expanded', isExpanded);
+
+          // Prevent body scroll when menu is open
+          document.body.style.overflow = isExpanded ? 'hidden' : '';
+        });
+
+        // Close menu when clicking on a link
+        const navLinks = navMenu.querySelectorAll('a');
+        navLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+          const isClickInsideNav = navMenu.contains(event.target);
+          const isClickOnHamburger = hamburger.contains(event.target);
+
+          if (!isClickInsideNav && !isClickOnHamburger && navMenu.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
