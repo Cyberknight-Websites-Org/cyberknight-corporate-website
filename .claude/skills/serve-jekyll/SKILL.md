@@ -27,6 +27,15 @@ The Jekyll server binds to `0.0.0.0:4000` to allow both local and Playwright acc
 
 The Playwright MCP server runs in a Docker container with `--network host` mode, giving it direct access to the host's network stack.
 
+### URL Mapping
+
+**Important**: When the user references `http://council-test.cyberknight-websites.com/`, you should navigate to `http://127.0.0.1:4000/` instead.
+
+- **User-facing URL**: `http://council-test.cyberknight-websites.com/` (VPN-accessible test URL for the user)
+- **Internal server URL**: `http://127.0.0.1:4000/` (what Playwright should actually use)
+
+Both URLs point to the same Jekyll development server, but Playwright must use the internal localhost address.
+
 ### Direct Access URL
 
 Playwright should access the Jekyll server using:
@@ -140,6 +149,24 @@ To run in background:
    ```
 
 3. Report to user: "Navigated to the about page"
+
+### Example 3: URL Mapping
+
+**User Request:** "Navigate to http://council-test.cyberknight-websites.com/pricing"
+
+**Actions:**
+1. Map the URL to internal address and navigate:
+   ```
+   mcp__playwright__browser_navigate(url="http://127.0.0.1:4000/pricing")
+   ```
+   (Note: council-test.cyberknight-websites.com → 127.0.0.1:4000)
+
+2. Take snapshot:
+   ```
+   mcp__playwright__browser_snapshot()
+   ```
+
+3. Report to user: "Navigated to the pricing page"
 
 ## Security Notes
 
