@@ -7,12 +7,12 @@ get_timestamp() {
 
 # Set up logging
 # Use $HOME/logs if it exists and is writable, otherwise use current directory
-if [ -w "$HOME/logs" ] || mkdir -p "$HOME/logs/cyberknight-corporate-website" 2>/dev/null; then
+if [ -w "$HOME/logs" ]; then
   LOG_DIR="$HOME/logs/cyberknight-corporate-website"
 else
   LOG_DIR="./logs"
-  mkdir -p "$LOG_DIR"
 fi
+mkdir -p "$LOG_DIR"
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG_FILE="$LOG_DIR/build_${TIMESTAMP}.log"
 
