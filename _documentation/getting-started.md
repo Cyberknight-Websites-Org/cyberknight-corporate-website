@@ -4,8 +4,6 @@ title: Getting Started with Your Council Website
 permalink: /docs/getting-started/
 ---
 
-# Getting Started with Your Council Website
-
 *This is a stub guide for demonstration purposes.*
 
 ## Introduction

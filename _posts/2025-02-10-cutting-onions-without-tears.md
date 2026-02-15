@@ -5,8 +5,6 @@ date: 2025-02-10 10:00:00 -0800
 categories: cooking tips
 ---
 
-# The Ultimate Guide to Tearless Onion Cutting
-
 ![Onion cutting demonstration](https://placecats.com/800/400)
 *Example of proper onion cutting technique (placeholder image)*
 
