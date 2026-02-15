@@ -6,9 +6,9 @@ get_timestamp() {
 }
 
 # Set up logging
-# Use /home/julian/logs if it exists and is writable, otherwise use current directory
-if [ -w "/home/julian/logs" ] || mkdir -p "/home/julian/logs/cyberknight-corporate-website" 2>/dev/null; then
-  LOG_DIR="/home/julian/logs/cyberknight-corporate-website"
+# Use $HOME/logs if it exists and is writable, otherwise use current directory
+if [ -w "$HOME/logs" ] || mkdir -p "$HOME/logs/cyberknight-corporate-website" 2>/dev/null; then
+  LOG_DIR="$HOME/logs/cyberknight-corporate-website"
 else
   LOG_DIR="./logs"
   mkdir -p "$LOG_DIR"
@@ -85,9 +85,9 @@ fi
 # Copy to nginx
 echo "Copying files to nginx directory..."
 STEP_START=$(get_timestamp)
-rm -rf $NGINX_DIR/corporate
-mkdir -p $NGINX_DIR/corporate
-cp -r $JEKYLL_DIR/_site/* $NGINX_DIR/corporate
+rm -rf $NGINX_DIR
+mkdir -p $NGINX_DIR
+cp -r $JEKYLL_DIR/_site/* $NGINX_DIR
 COPY_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
 
 # Calculate build duration

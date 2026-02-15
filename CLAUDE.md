@@ -81,6 +81,35 @@ The `/serve-jekyll` skill is configured for this project:
 - Documentation in `_documentation/` collection
 - Permalink structure: `/blog/:year/:month/:day/:title/`
 
+### Production Deployment
+
+The `server_build_script.sh` automates deployment to production servers:
+
+**What it does:**
+1. Clones the repository from GitHub
+2. Builds the Jekyll site using Docker
+3. Deploys to the specified nginx directory
+4. Logs all activity with timing breakdowns
+
+**Required parameters:**
+- `JEKYLL_DIR` - Temporary directory for cloning and building
+- `NGINX_DIR` - Target deployment directory for the built site
+- `JEKYLL_BUILDER_IMAGE` - Docker image containing Jekyll and dependencies
+
+**Example usage:**
+```bash
+./server_build_script.sh \
+  JEKYLL_DIR=/path/to/build/directory \
+  NGINX_DIR=/path/to/nginx/deployment \
+  JEKYLL_BUILDER_IMAGE=cyberknight-council-template-builder
+```
+
+**Webhook configuration:**
+The script is designed to work with webhook triggers. See the webhook JSON configuration in the repository for automated deployments on git push events.
+
+**Logs:**
+Build logs are saved to `/path/to/logs/cyberknight-corporate-website/build_TIMESTAMP.log` (or `./logs/` if the main log directory is not writable).
+
 ## Content Guidelines
 
 ### Product Descriptions
