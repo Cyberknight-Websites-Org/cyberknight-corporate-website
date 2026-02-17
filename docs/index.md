@@ -14,14 +14,11 @@ Welcome to the Cyberknight Websites documentation. Here you'll find guides and t
 
 ### Available Guides
 
+{% for doc in site.documentation %}
 <div class="doc-item">
-  <h3><a href="{{ '/docs/getting-started' | relative_url }}">Getting Started with Your Council Website</a></h3>
-  <p>Learn the basics of managing your council's online presence</p>
+  <h3><a href="{{ doc.url | relative_url }}">{{ doc.title }}</a></h3>
+  {% if doc.description %}<p>{{ doc.description }}</p>{% endif %}
 </div>
-
-<div class="doc-item">
-  <h3>More guides coming soon...</h3>
-  <p>We're actively working on expanding our documentation</p>
-</div>
+{% endfor %}
 
 </div>
