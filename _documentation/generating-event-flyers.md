@@ -44,12 +44,29 @@ After a flyer has been attached to an event, you can make changes by clicking th
 
 ## Flyer Style Options
 
-- **MS Word** - Simple, functional design resembling a typical Microsoft Word flyer template
-- **Rustic** - Warm, traditional, timeless aesthetic with natural materials and cozy ambiance
-- **Classic Formal** - Elegant, traditional design with ornate details and formal presentation
-- **Cartoony** - Fun, playful design with illustrated elements and vibrant cartoon aesthetics
-- **Vintage/Retro** - Nostalgic design inspired by mid-century aesthetics and classic poster styles
-- **Chalkboard** - Casual, friendly design resembling hand-drawn café chalkboard menus
+### MS Word
+
+![Simple, functional design resembling a typical Microsoft Word flyer template](/assets/images/docs/generating-event-flyers/ms-word-flyer.jpg)
+
+### Rustic
+
+![Warm, traditional, timeless aesthetic with natural materials and cozy ambiance](/assets/images/docs/generating-event-flyers/rustic-flyer.jpg)
+
+### Classic Formal
+
+![Elegant, traditional design with ornate details and formal presentation](/assets/images/docs/generating-event-flyers/Classic-Formal-flyer.jpg)
+
+### Cartoony
+
+![Fun, playful design with illustrated elements and vibrant cartoon aesthetics](/assets/images/docs/generating-event-flyers/Cartoony-flyer.jpg)
+
+### Vintage/Retro
+
+![Nostalgic design inspired by mid-century aesthetics and classic poster styles](/assets/images/docs/generating-event-flyers/Vintage-Retro-flyer.jpg)
+
+### Chalkboard
+
+![Casual, friendly design resembling hand-drawn café chalkboard menus](/assets/images/docs/generating-event-flyers/Chalkboard-flyer.jpg)
 
 ## Tips
 
