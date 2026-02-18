@@ -42,3 +42,4 @@ defaults:
       type: "documentation"
     values:
       layout: "page"
+      is_documentation: true

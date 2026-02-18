@@ -61,7 +61,7 @@ h2 {
 
 h3 {
   font-size: 2rem;
-  margin-left: 0.5rem;
+  margin-left: 0;
 }
 
 p {
@@ -534,6 +534,7 @@ a:hover {
   max-width: 100%;
   height: auto;
   display: block;
+  margin: 0 auto;
   max-height: 45vh;
 }
 
@@ -609,6 +610,10 @@ a:hover {
 }
 
 /* Documentation */
+.page-content.documentation h3 {
+  margin-left: 1rem;
+}
+
 .docs-list {
   max-width: 900px;
   margin: 0 auto;
