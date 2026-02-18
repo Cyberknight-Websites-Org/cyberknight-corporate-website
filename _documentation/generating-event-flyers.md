@@ -48,17 +48,13 @@ Once generated, you can review the flyer preview and either use it immediately o
 
 <img src="/assets/images/docs/generating-event-flyers/screenshot-03.png" alt="Generated flyer preview with refinement options" class="announcement-img-lightbox">
 
-### Step 5: Apply the flyer to your event
-
 Click "Use This Flyer" to attach it to your event, then click "Submit Edits" at the bottom of the page to save all changes.
-
-<img src="/assets/images/docs/generating-event-flyers/screenshot-04.png" alt="Event edit page showing the attached flyer with Download, Edit, and Remove buttons" class="announcement-img-lightbox">
 
 ## Editing an Existing Flyer (Optional)
 
 After a flyer has been attached to an event, you can make changes by clicking the "Edit" button in the Event Flyer section. You can change the style, add editing instructions describing what changes you want, or both, then generate a revision.
 
-<img src="/assets/images/docs/generating-event-flyers/screenshot-05.png" alt="Flyer editor showing options to revise the design" class="announcement-img-lightbox">
+<img src="/assets/images/docs/generating-event-flyers/screenshot-04.png" alt="Event edit page showing the attached flyer with Download, Edit, and Remove buttons" class="announcement-img-lightbox">
 
 ## Flyer Style Options
 
