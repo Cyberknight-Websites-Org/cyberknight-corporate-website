@@ -1,0 +1,67 @@
+---
+layout: default
+---
+
+<article class="page-content documentation">
+  <div class="container">
+    <header class="page-header">
+      <h1>{{ page.title }}</h1>
+    </header>
+
+    <div class="doc-layout">
+      <div class="doc-body">
+        {{ content }}
+      </div>
+
+      <aside class="doc-toc">
+        <div class="doc-toc-inner">
+          <p class="doc-toc-title">On This Page</p>
+          <nav id="doc-toc-nav"></nav>
+        </div>
+      </aside>
+    </div>
+  </div>
+</article>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var body = document.querySelector('.doc-body');
+    var nav = document.getElementById('doc-toc-nav');
+    if (!body || !nav) return;
+
+    var headings = body.querySelectorAll('h2, h3');
+    if (headings.length === 0) return;
+
+    var ul = document.createElement('ul');
+
+    headings.forEach(function(heading) {
+      var li = document.createElement('li');
+      li.className = heading.tagName.toLowerCase();
+
+      var a = document.createElement('a');
+      a.href = '#' + heading.id;
+      a.textContent = heading.textContent;
+
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+
+    nav.appendChild(ul);
+
+    // Scroll spy: highlight active section
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var id = entry.target.id;
+        var link = nav.querySelector('a[href="#' + id + '"]');
+        if (link && entry.isIntersecting) {
+          nav.querySelectorAll('a').forEach(function(a) { a.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+
+    headings.forEach(function(heading) {
+      if (heading.id) observer.observe(heading);
+    });
+  });
+</script>

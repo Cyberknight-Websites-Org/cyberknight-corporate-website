@@ -41,5 +41,4 @@ defaults:
       path: ""
       type: "documentation"
     values:
-      layout: "page"
-      is_documentation: true
+      layout: "doc"

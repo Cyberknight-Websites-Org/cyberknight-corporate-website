@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: doc
 title: Generating Event Flyers
 permalink: /docs/generating-event-flyers/
 ---

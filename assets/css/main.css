@@ -5,6 +5,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --accent-color: #3273DC;
   --bg-color: #fafafa;
@@ -612,6 +616,100 @@ a:hover {
 /* Documentation */
 .page-content.documentation h3 {
   margin-left: 1rem;
+}
+
+/* Documentation page layout with sticky TOC */
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 60px;
+  align-items: start;
+}
+
+.doc-body {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  min-width: 0;
+}
+
+.doc-body ol,
+.doc-body ul {
+  margin-bottom: 1rem;
+  padding-left: 2rem;
+}
+
+.doc-body ol li,
+.doc-body ul li {
+  margin-bottom: 0.5rem;
+}
+
+.doc-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  max-height: 45vh;
+}
+
+.doc-toc {
+  position: sticky;
+  top: 80px;
+}
+
+.doc-toc-inner {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.doc-toc-title {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.doc-toc nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.doc-toc nav ul li {
+  margin-bottom: 4px;
+}
+
+.doc-toc nav ul li.h3 {
+  padding-left: 14px;
+}
+
+.doc-toc nav ul li a {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  border-bottom: none;
+  display: block;
+  padding: 3px 0;
+  transition: color 0.2s ease;
+  line-height: 1.4;
+}
+
+.doc-toc nav ul li a:hover,
+.doc-toc nav ul li a.active {
+  color: var(--accent-color);
+}
+
+@media (max-width: 900px) {
+  .doc-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-toc {
+    position: static;
+    order: -1;
+  }
 }
 
 .docs-list {

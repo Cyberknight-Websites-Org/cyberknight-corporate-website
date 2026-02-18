@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: doc
 title: Getting Started with Your Council Website
 permalink: /docs/getting-started/
 ---
