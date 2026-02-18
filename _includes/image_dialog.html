@@ -1,0 +1,231 @@
+<script>
+  window.addEventListener("load", dialogButtonInitializer);
+
+  function dialogButtonInitializer() {
+    const all_pictures = document.querySelectorAll("picture");
+    const all_lightbox_images = document.querySelectorAll(
+      ".announcement-img-lightbox",
+    );
+    const dialog = document.querySelector("dialog");
+    const dialogContent = document.getElementById("img-dialog-content");
+    const closeButton = document.getElementById("img-dialog-close");
+    const prevButton = document.getElementById("img-dialog-prev");
+    const nextButton = document.getElementById("img-dialog-next");
+    const body = document.querySelector("body");
+    
+    var isDesktop = window.matchMedia("(min-width: 800px) and (orientation: landscape) and (hover: hover) and (pointer: fine)");
+    let currentImageOrder = null;
+    let galleryImages = Array.from(all_lightbox_images).filter(img => img.hasAttribute('data-image-order'));
+
+    // Function to update arrow button visibility
+    function updateArrowVisibility() {
+      const shouldShowArrows = isDesktop.matches && galleryImages.length > 1;
+      prevButton.style.display = shouldShowArrows ? "flex" : "none";
+      nextButton.style.display = shouldShowArrows ? "flex" : "none";
+    }
+
+    // Function to show image by order
+    function showImageByOrder(order) {
+      const targetImage = galleryImages.find(img => img.getAttribute("data-image-order") === order.toString());
+      if (targetImage) {
+        const fullImageUrl = targetImage.getAttribute("data-full-image") || targetImage.src;
+        const imgHtml = `<img src="${fullImageUrl}" alt="Full size image">`;
+        dialogContent.innerHTML = imgHtml;
+        currentImageOrder = order;
+      }
+    }
+
+    // Function to navigate to previous image
+    function navigatePrevious() {
+      if (currentImageOrder === null || galleryImages.length <= 1) return;
+      
+      const orders = galleryImages.map(img => parseInt(img.getAttribute("data-image-order"))).sort((a, b) => a - b);
+      const currentIndex = orders.indexOf(currentImageOrder);
+      const previousIndex = currentIndex === 0 ? orders.length - 1 : currentIndex - 1;
+      showImageByOrder(orders[previousIndex]);
+    }
+
+    // Function to navigate to next image
+    function navigateNext() {
+      if (currentImageOrder === null || galleryImages.length <= 1) return;
+      
+      const orders = galleryImages.map(img => parseInt(img.getAttribute("data-image-order"))).sort((a, b) => a - b);
+      const currentIndex = orders.indexOf(currentImageOrder);
+      const nextIndex = currentIndex === orders.length - 1 ? 0 : currentIndex + 1;
+      showImageByOrder(orders[nextIndex]);
+    }
+
+    // Handle announcement-img-lightbox class images (including those inside pictures)
+    all_lightbox_images.forEach((img) => {
+      img.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation(); // Prevent picture click event from triggering
+        
+        if (img.hasAttribute('data-image-order')) {
+          // Handle images with gallery navigation
+          const order = parseInt(img.getAttribute("data-image-order"));
+          currentImageOrder = order;
+          showImageByOrder(order);
+        } else {
+          // Handle individual images without gallery navigation
+          const fullImageUrl = img.getAttribute("data-full-image") || img.src;
+          const imgHtml = `<img src="${fullImageUrl}" alt="Full size image">`;
+          dialogContent.innerHTML = imgHtml;
+          currentImageOrder = null;
+        }
+
+        dialog.showModal();
+        body.style.overflow = "hidden";
+        updateArrowVisibility();
+      });
+    });
+
+    // Handle regular picture elements (only those that don't contain lightbox images)
+    all_pictures.forEach((openDialogButton) => {
+      openDialogButton.addEventListener("click", (event) => {
+        // Skip if the click was on a lightbox image
+        if (event.target.classList.contains("announcement-img-lightbox")) {
+          return;
+        }
+
+        // Copy the contents of the clicked picture into the dialog content
+        let htmlContent = event.target.outerHTML;
+        htmlContent = htmlContent
+          .replace(/max-height: 60vh/g, "")
+          .replace(/border-radius: 1rem;/g, "");
+        dialogContent.innerHTML = htmlContent;
+
+        dialog.showModal();
+        body.style.overflow = "hidden";
+      });
+    });
+
+    // Handle close button click
+    closeButton.addEventListener("click", () => {
+      dialog.close();
+      body.style.overflow = "";
+    });
+
+    // Handle arrow button clicks
+    prevButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      navigatePrevious();
+    });
+    nextButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      navigateNext();
+    });
+
+    // Handle keyboard navigation
+    document.addEventListener("keydown", (event) => {
+      if (!dialog.open) return;
+      
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        navigatePrevious();
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        navigateNext();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        dialog.close();
+        body.style.overflow = "";
+      }
+    });
+
+    // Update arrow visibility on resize/orientation change
+    isDesktop.addEventListener("change", updateArrowVisibility);
+
+    dialog.addEventListener("click", (event) => {
+      const dialogDimensions = dialog.getBoundingClientRect();
+      if (
+        event.clientX < dialogDimensions.left ||
+        event.clientX > dialogDimensions.right ||
+        event.clientY < dialogDimensions.top ||
+        event.clientY > dialogDimensions.bottom
+      ) {
+        dialog.close();
+        body.style.overflow = "";
+      }
+    });
+  }
+</script>
+
+<dialog id="img-dialog">
+  <button
+    id="img-dialog-close"
+    style="
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 3rem;
+      height: 3rem;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    "
+  >
+    <img
+      src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/a1232e34553634c5363aa62c8d1b02161a4438e1/svgs/solid/xmark.svg"
+      alt="Close"
+      style="width: 2rem; height: 2rem"
+    />
+  </button>
+  <button
+    id="img-dialog-prev"
+    style="
+      position: fixed;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3rem;
+      height: 3rem;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    "
+  >
+    <img
+      src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/a1232e34553634c5363aa62c8d1b02161a4438e1/svgs/solid/chevron-left.svg"
+      alt="Previous"
+      style="width: 2rem; height: 2rem"
+    />
+  </button>
+  <button
+    id="img-dialog-next"
+    style="
+      position: fixed;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3rem;
+      height: 3rem;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    "
+  >
+    <img
+      src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/a1232e34553634c5363aa62c8d1b02161a4438e1/svgs/solid/chevron-right.svg"
+      alt="Next"
+      style="width: 2rem; height: 2rem"
+    />
+  </button>
+  <div id="img-dialog-content"></div>
+</dialog>
+

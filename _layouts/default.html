@@ -5,6 +5,7 @@
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 </head>
 <body>
+  {% include image_dialog.html %}
   {% include header.html %}
 
   <main>
@@ -14,6 +15,11 @@
   {% include footer.html %}
 
   <script>
+    // Initialize image lightbox
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(dialogButtonInitializer, 50);
+    });
+
     // Hamburger menu toggle
     document.addEventListener('DOMContentLoaded', function() {
       const hamburger = document.querySelector('.hamburger');
