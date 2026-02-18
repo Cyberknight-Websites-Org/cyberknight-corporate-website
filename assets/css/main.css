@@ -614,8 +614,8 @@ a:hover {
 }
 
 /* Documentation */
-.page-content.documentation h3 {
-  margin-left: 1rem;
+.page-content.documentation h2 {
+  margin-bottom: 2rem;
 }
 
 /* Documentation page layout with sticky TOC */
