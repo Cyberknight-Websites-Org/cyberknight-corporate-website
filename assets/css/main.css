@@ -28,6 +28,43 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* View Transitions */
+@view-transition {
+  navigation: auto;
+}
+
+h1 {
+  view-transition-name: page-heading;
+}
+
+main {
+  view-transition-name: main-content;
+}
+
+::view-transition-old(page-heading),
+::view-transition-new(page-heading) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
+}
+
+::view-transition-old(main-content) {
+  animation: 0.2s ease both fade-and-slide-out;
+}
+
+::view-transition-new(main-content) {
+  animation: 0.3s ease both fade-and-slide-in;
+}
+
+@keyframes fade-and-slide-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes fade-and-slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 12px;
