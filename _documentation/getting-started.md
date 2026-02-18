@@ -2,6 +2,8 @@
 layout: doc
 title: Getting Started with Your Council Website
 permalink: /docs/getting-started/
+section: getting-started
+description: A guide to getting started with your council website, covering the Secure Portal, creating events, publishing posts, managing members, and sending announcements.
 ---
 
 *This is a stub guide for demonstration purposes.*

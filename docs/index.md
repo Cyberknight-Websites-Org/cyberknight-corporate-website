@@ -8,12 +8,20 @@ Guides and tutorials for using your council website and the Cyberknight Secure P
 
 ## Getting Started
 
+{% assign section_docs = site.documentation | where: "section", "getting-started" %}
+{% for doc in section_docs %}
 <div class="doc-item">
-  <h3><a href="/docs/getting-started/">Getting Started with Your Council Website</a></h3>
+  <h3><a href="{{ doc.url | relative_url }}">{{ doc.title }}</a></h3>
+  {% if doc.description %}<p>{{ doc.description }}</p>{% endif %}
 </div>
+{% endfor %}
 
 ## Flyers
 
+{% assign section_docs = site.documentation | where: "section", "flyers" %}
+{% for doc in section_docs %}
 <div class="doc-item">
-  <h3><a href="/docs/generating-event-flyers/">Generating Event Flyers</a></h3>
+  <h3><a href="{{ doc.url | relative_url }}">{{ doc.title }}</a></h3>
+  {% if doc.description %}<p>{{ doc.description }}</p>{% endif %}
 </div>
+{% endfor %}

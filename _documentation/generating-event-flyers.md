@@ -2,6 +2,8 @@
 layout: doc
 title: Generating Event Flyers
 permalink: /docs/generating-event-flyers/
+section: flyers
+description: The Event Flyer Generator creates professional, AI-generated flyers for your events using the information already entered in the event form.
 ---
 
 The Event Flyer Generator creates professional, AI-generated flyers for your events using the information already entered in the event form.
