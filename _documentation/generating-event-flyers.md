@@ -8,6 +8,22 @@ description: The Event Flyer Generator creates professional, AI-generated flyers
 
 The Event Flyer Generator creates professional, AI-generated flyers for your events using the information already entered in the event form.
 
+## Generating a Standalone Flyer
+
+You can also generate a flyer without attaching it to a specific event. This is useful for creating custom flyers for promotions or announcements.
+
+### Step 1: Navigate to Events Overview and click "Generate Flyer"
+
+From the Events Overview page, click the blue "Generate Flyer" button in the Events Actions section to start creating a custom standalone flyer.
+
+<img src="/assets/images/docs/generating-event-flyers/screenshot-06.png" alt="Events Overview page with Generate Flyer button in the Events Actions section" class="announcement-img-lightbox">
+
+### Step 2: Follow the flyer generation process
+
+Follow the same process as event-attached flyers: edit content, select a style, generate, and review. The main difference is that when you're ready to use the flyer, it will download directly to your device as a JPEG image instead of being attached to an event.
+
+## Creating a Flyer for a Specific Event
+
 ## Steps
 
 ### Step 1: Open the event editor and click "Generate AI Flyer"
