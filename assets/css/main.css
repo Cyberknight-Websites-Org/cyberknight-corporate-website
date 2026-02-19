@@ -666,13 +666,22 @@ a:hover {
 
 /* Documentation index */
 .page-content.docs-index h2 {
-  font-size: 1.25rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
   margin-top: 1.5rem;
 }
 
 .page-content.docs-index h2:first-of-type {
   margin-top: 0.5rem;
+}
+
+/* Individual doc pages */
+.page-content.documentation:not(.docs-index) .doc-body h2 {
+  font-size: 2rem;
+}
+
+.page-content.documentation:not(.docs-index) .doc-body h3 {
+  font-size: 1.5rem;
 }
 
 /* Documentation page layout with sticky TOC */
