@@ -41,10 +41,3 @@ The newsletter preview displays:
 - **Latest Posts** - Recent blog or news posts from your council
 - **Columbia Magazine** - The current month's issue of the official Knights of Columbus magazine
 
-## Tips
-
-- **Check all events** - Verify that upcoming meetings and events are listed with correct dates and times
-- **Review formatting** - Make sure all text, images, and links display properly before sending
-- **Back to Overview** - Click the **Back to Overview** button at the bottom to return without sending
-- **Send when ready** - Once you've confirmed the preview looks good, use the **Send Newsletter** button from the overview page to deliver it
-- **View past newsletters** - From the Recently Sent Newsletters table, click **View** to preview previously sent newsletters for reference
