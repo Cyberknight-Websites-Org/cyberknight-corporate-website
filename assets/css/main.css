@@ -664,14 +664,14 @@ a:hover {
   }
 }
 
-/* Documentation */
-.page-content.documentation h2 {
+/* Documentation index */
+.page-content.docs-index h2 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
   margin-top: 1.5rem;
 }
 
-.page-content.documentation h2:first-of-type {
+.page-content.docs-index h2:first-of-type {
   margin-top: 0.5rem;
 }
 
