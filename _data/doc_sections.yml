@@ -1,5 +1,11 @@
+- id: announcements
+  title: Announcements
+
 - id: events
   title: Events
+
+- id: members
+  title: Members
 
 - id: newsletters
   title: Newsletters
