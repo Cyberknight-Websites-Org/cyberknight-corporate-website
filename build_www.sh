@@ -11,6 +11,19 @@ JEKYLL_BUILDER_IMAGE="cyberknight-council-template-builder"
 REPO_URL="https://github.com/Cyberknight-Websites-Org/cyberknight-corporate-website.git"
 JEKYLL_DIR="/tmp/cyberknight-www-build"
 
+FORCE_FULL=false
+for arg in "$@"; do
+  case "$arg" in
+    --force-full)
+      FORCE_FULL=true
+      ;;
+    *)
+      echo "ERROR: Unknown argument '$arg'. Usage: $0 [--force-full]"
+      exit 1
+      ;;
+  esac
+done
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -89,39 +102,21 @@ if [ $DOCKER_EXIT_CODE -ne 0 ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Sync to S3
+# Deploy to S3 + Cloudflare
 # ---------------------------------------------------------------------------
 
-echo "Syncing to S3..."
 STEP_START=$(get_timestamp)
-doppler run --project cyberknight-s3-sync --config prd -- \
-  aws s3 sync "$JEKYLL_DIR/_site/" s3://cyberknight-websites/www/ --delete
+DEPLOY_ARGS=""
+if [ "$FORCE_FULL" = true ]; then
+  DEPLOY_ARGS="--force-full"
+fi
+
+./deploy.sh $DEPLOY_ARGS
 if [ $? -ne 0 ]; then
-  echo "ERROR: S3 sync failed. Exiting."
+  echo "ERROR: Deploy failed. Exiting."
   exit 1
 fi
-SYNC_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
-
-# ---------------------------------------------------------------------------
-# Purge Cloudflare cache
-# ---------------------------------------------------------------------------
-
-echo "Purging Cloudflare cache..."
-STEP_START=$(get_timestamp)
-CF_TOKEN=$(doppler secrets get CLOUDFLARE_API_TOKEN --project cyberknight-s3-sync --config prd --plain)
-
-CF_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
-  "https://api.cloudflare.com/client/v4/zones/9dbd179caf99bb5fd469db1545fbb431/purge_cache" \
-  -H "Authorization: Bearer $CF_TOKEN" \
-  -H "Content-Type: application/json" \
-  --data '{"prefixes": ["www.cyberknight-websites.com/"]}')
-PURGE_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
-
-if [ "$CF_HTTP_CODE" != "200" ]; then
-  echo "WARNING: Cloudflare cache purge returned HTTP $CF_HTTP_CODE."
-else
-  echo "  → Cache purge complete (HTTP $CF_HTTP_CODE) in ${PURGE_TIME}s"
-fi
+DEPLOY_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
 
 # ---------------------------------------------------------------------------
 # Done
@@ -137,5 +132,4 @@ echo ""
 echo "Step-by-step breakdown:"
 echo "  1. Git clone:          ${CLONE_TIME}s"
 echo "  2. Jekyll build:       ${BUILD_TIME}s"
-echo "  3. S3 sync:            ${SYNC_TIME}s"
-echo "  4. Cache purge:        ${PURGE_TIME}s"
+echo "  3. Deploy:             ${DEPLOY_TIME}s"

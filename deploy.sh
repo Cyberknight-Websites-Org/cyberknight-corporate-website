@@ -156,11 +156,12 @@ MAX_PARALLEL_UPLOADS=8
 # Step 4: Doppler token
 # ---------------------------------------------------------------------------
 
-export DOPPLER_TOKEN="$(pass show cyberknight/s3-sync-doppler-token)"
-
 if [ -z "$DOPPLER_TOKEN" ]; then
-  echo "ERROR: Could not retrieve Doppler token from pass. Exiting."
-  exit 1
+  export DOPPLER_TOKEN="$(pass show cyberknight/s3-sync-doppler-token)"
+  if [ -z "$DOPPLER_TOKEN" ]; then
+    echo "ERROR: Could not retrieve Doppler token from pass. Exiting."
+    exit 1
+  fi
 fi
 
 if [ ! -d "$SITE_DIR" ]; then
