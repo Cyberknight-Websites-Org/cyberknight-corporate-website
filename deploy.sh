@@ -97,18 +97,18 @@ check_dependencies() {
     failures+=("perl — binary not found in PATH")
   fi
 
-  # Doppler project/config accessibility
-  local doppler_token_check
-  doppler_token_check=$(doppler secrets get CLOUDFLARE_API_TOKEN --project cyberknight-s3-sync --config prd --plain 2>/dev/null) || true
-  if [ -z "$doppler_token_check" ]; then
-    failures+=("Doppler project cyberknight-s3-sync / prd is not accessible or CLOUDFLARE_API_TOKEN is missing")
-  fi
-
   # pass key accessibility
   local pass_token_check
   pass_token_check=$(pass show cyberknight/s3-sync-doppler-token 2>/dev/null) || true
   if [ -z "$pass_token_check" ]; then
     failures+=("pass key cyberknight/s3-sync-doppler-token is not accessible (missing GPG key or uninitialized password store?)")
+  fi
+
+  # Doppler project/config accessibility
+  local doppler_token_check
+  doppler_token_check=$(DOPPLER_TOKEN="$pass_token_check" doppler secrets get CLOUDFLARE_API_TOKEN --project cyberknight-s3-sync --config prd --plain 2>/dev/null) || true
+  if [ -z "$doppler_token_check" ]; then
+    failures+=("Doppler project cyberknight-s3-sync / prd is not accessible or CLOUDFLARE_API_TOKEN is missing")
   fi
 
   if [ ${#failures[@]} -gt 0 ]; then
@@ -150,6 +150,7 @@ MANIFEST_KEY="${S3_FOLDER}/.manifest.json"
 CF_ZONE_ID="9dbd179caf99bb5fd469db1545fbb431"
 CF_HOSTNAME="www.cyberknight-websites.com"
 CF_PURGE_CHUNK_SIZE=500
+MAX_PARALLEL_UPLOADS=8
 
 # ---------------------------------------------------------------------------
 # Step 4: Doppler token
@@ -162,6 +163,19 @@ if [ -z "$DOPPLER_TOKEN" ]; then
   exit 1
 fi
 
+if [ ! -d "$SITE_DIR" ]; then
+  echo "ERROR: Site directory '${SITE_DIR}' not found. Run a Jekyll build first."
+  exit 1
+fi
+
+export AWS_ACCESS_KEY_ID=$(doppler secrets get AWS_ACCESS_KEY_ID --project cyberknight-s3-sync --config prd --plain)
+export AWS_SECRET_ACCESS_KEY=$(doppler secrets get AWS_SECRET_ACCESS_KEY --project cyberknight-s3-sync --config prd --plain)
+
+if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+  echo "ERROR: Could not retrieve AWS credentials from Doppler. Exiting."
+  exit 1
+fi
+
 # ---------------------------------------------------------------------------
 # Step 5: Fetch previous manifest
 # ---------------------------------------------------------------------------
@@ -170,8 +184,7 @@ PREV_MANIFEST_FILE=$(add_temp)
 FULL_UPLOAD=false
 
 STEP_START=$(get_timestamp)
-if ! doppler run --project cyberknight-s3-sync --config prd -- \
-  aws s3 cp "s3://${S3_BUCKET}/${MANIFEST_KEY}" "$PREV_MANIFEST_FILE" 2>/dev/null; then
+if ! aws s3 cp "s3://${S3_BUCKET}/${MANIFEST_KEY}" "$PREV_MANIFEST_FILE" --region us-east-1 2>/dev/null; then
   echo "No previous manifest found in S3. Performing full upload."
   FULL_UPLOAD=true
 fi
@@ -228,32 +241,33 @@ else
   UNCHANGED_FILE=$(add_temp)
 
   # Merge both manifests, compare values for added/modified vs unchanged
-  jq -n --slurpfile prev "$PREV_MANIFEST_FILE" --slurpfile curr "$CURRENT_MANIFEST_FILE" '
+  jq -rn --slurpfile prev "$PREV_MANIFEST_FILE" --slurpfile curr "$CURRENT_MANIFEST_FILE" '
     ($prev[0] // {}) as $p |
     ($curr[0]) as $c |
-    # added_or_modified: keys in curr not in prev, or hash differs
-    [($c | keys[]) as $k | select(($p[$k] // null) != $c[$k])] |
-    sort
+    [$c | keys[] | . as $k | select(($p[$k] // null) != $c[$k])] |
+    sort |
+    .[]
   ' > "$ADDED_MODIFIED_FILE"
 
   # deleted: keys in prev not in curr
-  jq -n --slurpfile prev "$PREV_MANIFEST_FILE" --slurpfile curr "$CURRENT_MANIFEST_FILE" '
+  jq -rn --slurpfile prev "$PREV_MANIFEST_FILE" --slurpfile curr "$CURRENT_MANIFEST_FILE" '
     ($prev[0] // {}) as $p |
     ($curr[0]) as $c |
-    [($p | keys[]) as $k | select(($c[$k] // null) == null)] |
-    sort
+    [$p | keys[] | . as $k | select(($c[$k] // null) == null)] |
+    sort |
+    .[]
   ' > "$DELETED_FILE"
 
   # unchanged: keys in both with same hash
   jq -n --slurpfile prev "$PREV_MANIFEST_FILE" --slurpfile curr "$CURRENT_MANIFEST_FILE" '
     ($prev[0] // {}) as $p |
     ($curr[0]) as $c |
-    [($c | keys[]) as $k | select($p[$k] == $c[$k])] |
+    [$c | keys[] | . as $k | select($p[$k] == $c[$k])] |
     length
   ' > "$UNCHANGED_FILE"
 
-  ADDED_COUNT=$(jq -r 'length' "$ADDED_MODIFIED_FILE")
-  DELETED_COUNT=$(jq -r 'length' "$DELETED_FILE")
+  ADDED_COUNT=$(wc -l < "$ADDED_MODIFIED_FILE")
+  DELETED_COUNT=$(wc -l < "$DELETED_FILE")
   UNCHANGED_COUNT=$(cat "$UNCHANGED_FILE")
 fi
 
@@ -273,15 +287,26 @@ fi
 STEP_START=$(get_timestamp)
 
 echo "Uploading ${ADDED_COUNT} file(s) to S3..."
+upload_pids=()
+upload_failed=false
+
 while IFS= read -r rel_path; do
-  local_path="${SITE_DIR}/${rel_path}"
-  doppler run --project cyberknight-s3-sync --config prd -- \
-    aws s3 cp "$local_path" "s3://${S3_BUCKET}/${S3_FOLDER}/${rel_path}"
-  if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to upload ${local_path}. Exiting."
-    exit 1
+  aws s3 cp "${SITE_DIR}/${rel_path}" "s3://${S3_BUCKET}/${S3_FOLDER}/${rel_path}" --region us-east-1 &
+  upload_pids+=($!)
+  if [ ${#upload_pids[@]} -ge "$MAX_PARALLEL_UPLOADS" ]; then
+    wait "${upload_pids[0]}" || upload_failed=true
+    upload_pids=("${upload_pids[@]:1}")
   fi
 done < "$ADDED_MODIFIED_FILE"
+
+for pid in "${upload_pids[@]}"; do
+  wait "$pid" || upload_failed=true
+done
+
+if [ "$upload_failed" = true ]; then
+  echo "ERROR: One or more uploads failed. Exiting."
+  exit 1
+fi
 
 UPLOAD_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
 echo "  → S3 uploads complete in ${UPLOAD_TIME}s"
@@ -291,14 +316,26 @@ STEP_START=$(get_timestamp)
 
 if [ "$DELETED_COUNT" -gt 0 ]; then
   echo "Deleting ${DELETED_COUNT} file(s) from S3..."
+  delete_pids=()
+  delete_failed=false
+
   while IFS= read -r rel_path; do
-    doppler run --project cyberknight-s3-sync --config prd -- \
-      aws s3 rm "s3://${S3_BUCKET}/${S3_FOLDER}/${rel_path}"
-    if [ $? -ne 0 ]; then
-      echo "ERROR: Failed to delete s3://${S3_BUCKET}/${S3_FOLDER}/${rel_path}. Exiting."
-      exit 1
+    aws s3 rm "s3://${S3_BUCKET}/${S3_FOLDER}/${rel_path}" --region us-east-1 &
+    delete_pids+=($!)
+    if [ ${#delete_pids[@]} -ge "$MAX_PARALLEL_UPLOADS" ]; then
+      wait "${delete_pids[0]}" || delete_failed=true
+      delete_pids=("${delete_pids[@]:1}")
     fi
   done < "$DELETED_FILE"
+
+  for pid in "${delete_pids[@]}"; do
+    wait "$pid" || delete_failed=true
+  done
+
+  if [ "$delete_failed" = true ]; then
+    echo "ERROR: One or more deletes failed. Exiting."
+    exit 1
+  fi
 fi
 
 DELETE_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
@@ -310,8 +347,7 @@ echo "  → S3 deletes complete in ${DELETE_TIME}s"
 
 STEP_START=$(get_timestamp)
 echo "Updating manifest in S3..."
-doppler run --project cyberknight-s3-sync --config prd -- \
-  aws s3 cp "$CURRENT_MANIFEST_FILE" "s3://${S3_BUCKET}/${MANIFEST_KEY}"
+aws s3 cp "$CURRENT_MANIFEST_FILE" "s3://${S3_BUCKET}/${MANIFEST_KEY}" --region us-east-1
 if [ $? -ne 0 ]; then
   echo "ERROR: Failed to update manifest in S3. Exiting."
   echo "WARNING: The next build will diff against stale state. Consider running with --force-full on the next deploy."

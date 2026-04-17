@@ -24,6 +24,13 @@ exclude:
   - Dockerfile
   - README.md
   - .claude/
+  - CLAUDE.md
+  - deploy.sh
+  - build_www.sh
+  - server_build_script.sh
+  - jekyll_serve_dev.sh
+  - doc-skill-update.md
+  - logs/
 
 # Defaults
 defaults:
