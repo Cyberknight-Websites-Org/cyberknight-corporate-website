@@ -158,7 +158,6 @@ Focus on the importance of digital communication (websites, email, SMS) in the m
 
 ### Git Workflow
 - Commit meaningful changes with clear messages
-- Include "Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 - Don't use destructive git commands without explicit permission
 
 ### Design Consistency
