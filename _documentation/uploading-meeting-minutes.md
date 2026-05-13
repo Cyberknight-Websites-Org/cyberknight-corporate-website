@@ -6,7 +6,7 @@ section: meeting-minutes
 description: Upload existing PDF meeting minutes to your council archive for storage and AI-powered transcription search.
 ---
 
-Upload your council's meeting minutes as PDF files to keep them organized and make them searchable through AI transcriptions.
+Upload your council's meeting minutes as PDF files to keep them organized and make them searchable through transcriptions.
 
 ## Uploading a PDF
 
@@ -57,5 +57,5 @@ Uploaded PDFs appear in the Recent Meeting Minutes section on the overview page.
 ## Tips
 
 - **File type** — Only PDF files can be uploaded. If your minutes are in another format, convert them to PDF first.
-- **Transcription** — After uploading, the system automatically generates a searchable AI transcription from the PDF. This may take a few minutes.
-- **Search** — Use the **Search** button on the overview page to find specific topics across all your meeting minutes.
+- **Transcription** — After uploading, the system automatically generates a searchable transcription from the PDF. This may take a few minutes to process in the background.
+- **Search** — Use the **Search** button on the overview page to search for keywords across all your meeting minutes.
