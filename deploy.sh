@@ -149,7 +149,7 @@ SITE_DIR="_site"
 MANIFEST_KEY="${S3_FOLDER}/.manifest.json"
 CF_ZONE_ID="9dbd179caf99bb5fd469db1545fbb431"
 CF_HOSTNAME="www.cyberknight-websites.com"
-CF_PURGE_CHUNK_SIZE=500
+CF_PURGE_CHUNK_SIZE=30
 MAX_PARALLEL_UPLOADS=8
 
 # ---------------------------------------------------------------------------
@@ -407,10 +407,14 @@ for (( i=0; i<NUM_CHUNKS; i++ )); do
     -H "Content-Type: application/json" \
     --data "{\"files\": ${CHUNK_JSON}}")
 
-  if [ "$HTTP_CODE" != "200" ]; then
-    echo "ERROR: Cloudflare cache purge returned HTTP ${HTTP_CODE}."
+  CF_SUCCESS=$(jq -r '.success' "$PURGE_RESPONSE_FILE" 2>/dev/null)
+
+  if [ "$HTTP_CODE" != "200" ] || [ "$CF_SUCCESS" != "true" ]; then
+    echo "ERROR: Cloudflare cache purge failed (HTTP ${HTTP_CODE}, success=${CF_SUCCESS})."
     cat "$PURGE_RESPONSE_FILE" >&2
     PURGE_FAILED=true
+  else
+    echo "  → Purged chunk $((i+1))/${NUM_CHUNKS} ($(echo "$CHUNK_JSON" | jq 'length') URLs)"
   fi
 done
 
