@@ -148,8 +148,6 @@ S3_FOLDER="www"
 SITE_DIR="_site"
 MANIFEST_KEY="${S3_FOLDER}/.manifest.json"
 CF_ZONE_ID="9dbd179caf99bb5fd469db1545fbb431"
-CF_HOSTNAME="www.cyberknight-websites.com"
-CF_PURGE_CHUNK_SIZE=30
 MAX_PARALLEL_UPLOADS=8
 
 # ---------------------------------------------------------------------------
@@ -359,72 +357,31 @@ MANIFEST_WRITE_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
 echo "  → Manifest updated in ${MANIFEST_WRITE_TIME}s"
 
 # ---------------------------------------------------------------------------
-# Step 10: Purge Cloudflare cache
+# Step 10: Purge Cloudflare cache (purge everything)
 # ---------------------------------------------------------------------------
 
 STEP_START=$(get_timestamp)
-echo "Purging Cloudflare cache..."
+echo "Purging Cloudflare cache (purge everything)..."
 
 CF_TOKEN=$(doppler secrets get CLOUDFLARE_API_TOKEN --project cyberknight-s3-sync --config prd --plain)
 
-# Build list of all changed URLs
-CHANGED_URLS_FILE=$(add_temp)
-: > "$CHANGED_URLS_FILE"
+PURGE_RESPONSE_FILE=$(add_temp)
 
-while IFS= read -r rel_path; do
-  echo "https://${CF_HOSTNAME}/${rel_path}" >> "$CHANGED_URLS_FILE"
-  # Cloudflare caches index.html and its parent directory as separate
-  # cache keys. Purge the directory path too so visitors hitting / or
-  # /docs/foo/ get the new content instead of a stale cached copy.
-  if [ "$rel_path" = "index.html" ]; then
-    echo "https://${CF_HOSTNAME}/" >> "$CHANGED_URLS_FILE"
-  elif [[ "$rel_path" == */index.html ]]; then
-    dir_path="${rel_path%/index.html}"
-    echo "https://${CF_HOSTNAME}/${dir_path}/" >> "$CHANGED_URLS_FILE"
-  fi
-done < "$ADDED_MODIFIED_FILE"
+HTTP_CODE=$(curl -s -o "$PURGE_RESPONSE_FILE" -w "%{http_code}" \
+  -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+  -H "Authorization: Bearer ${CF_TOKEN}" \
+  -H "Content-Type: application/json" \
+  --data '{"purge_everything":true}')
 
-while IFS= read -r rel_path; do
-  echo "https://${CF_HOSTNAME}/${rel_path}" >> "$CHANGED_URLS_FILE"
-done < "$DELETED_FILE"
+CF_SUCCESS=$(jq -r '.success' "$PURGE_RESPONSE_FILE" 2>/dev/null)
 
-TOTAL_CHANGED=$(wc -l < "$CHANGED_URLS_FILE")
-NUM_CHUNKS=$(( (TOTAL_CHANGED + CF_PURGE_CHUNK_SIZE - 1) / CF_PURGE_CHUNK_SIZE ))
-
-PURGE_FAILED=false
-for (( i=0; i<NUM_CHUNKS; i++ )); do
-  CHUNK_START=$((i * CF_PURGE_CHUNK_SIZE))
-  CHUNK_END=$((CHUNK_START + CF_PURGE_CHUNK_SIZE))
-
-  # Extract chunk and build JSON array
-  CHUNK_JSON=$(sed -n "$((CHUNK_START + 1)),$((CHUNK_END))p" "$CHANGED_URLS_FILE" | jq -R . | jq -s .)
-
-  PURGE_RESPONSE_FILE=$(add_temp)
-
-  HTTP_CODE=$(curl -s -o "$PURGE_RESPONSE_FILE" -w "%{http_code}" \
-    -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
-    -H "Authorization: Bearer ${CF_TOKEN}" \
-    -H "Content-Type: application/json" \
-    --data "{\"files\": ${CHUNK_JSON}}")
-
-  CF_SUCCESS=$(jq -r '.success' "$PURGE_RESPONSE_FILE" 2>/dev/null)
-
-  if [ "$HTTP_CODE" != "200" ] || [ "$CF_SUCCESS" != "true" ]; then
-    echo "ERROR: Cloudflare cache purge failed (HTTP ${HTTP_CODE}, success=${CF_SUCCESS})."
-    cat "$PURGE_RESPONSE_FILE" >&2
-    PURGE_FAILED=true
-  else
-    echo "  → Purged chunk $((i+1))/${NUM_CHUNKS} ($(echo "$CHUNK_JSON" | jq 'length') URLs)"
-  fi
-done
-
-PURGE_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
-
-if [ "$PURGE_FAILED" = true ]; then
-  echo "ERROR: Cloudflare cache purge failed. Exiting."
+if [ "$HTTP_CODE" != "200" ] || [ "$CF_SUCCESS" != "true" ]; then
+  echo "ERROR: Cloudflare cache purge failed (HTTP ${HTTP_CODE}, success=${CF_SUCCESS})."
+  cat "$PURGE_RESPONSE_FILE" >&2
   exit 1
 fi
 
+PURGE_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
 echo "  → Cache purge complete in ${PURGE_TIME}s"
 
 # ---------------------------------------------------------------------------
