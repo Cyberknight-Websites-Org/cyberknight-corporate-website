@@ -373,6 +373,15 @@ CHANGED_URLS_FILE=$(add_temp)
 
 while IFS= read -r rel_path; do
   echo "https://${CF_HOSTNAME}/${rel_path}" >> "$CHANGED_URLS_FILE"
+  # Cloudflare caches index.html and its parent directory as separate
+  # cache keys. Purge the directory path too so visitors hitting / or
+  # /docs/foo/ get the new content instead of a stale cached copy.
+  if [ "$rel_path" = "index.html" ]; then
+    echo "https://${CF_HOSTNAME}/" >> "$CHANGED_URLS_FILE"
+  elif [[ "$rel_path" == */index.html ]]; then
+    dir_path="${rel_path%/index.html}"
+    echo "https://${CF_HOSTNAME}/${dir_path}/" >> "$CHANGED_URLS_FILE"
+  fi
 done < "$ADDED_MODIFIED_FILE"
 
 while IFS= read -r rel_path; do
