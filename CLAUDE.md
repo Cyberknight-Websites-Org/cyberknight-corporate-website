@@ -83,32 +83,21 @@ The `/serve-jekyll` skill is configured for this project:
 
 ### Production Deployment
 
-The `server_build_script.sh` automates deployment to production servers:
+`build_www.sh` is the manual production entrypoint. It clones the repository into a unique temporary directory, builds Jekyll through Docker, and invokes `deploy.sh`. Corporate deployment is intentionally independent of the Izumi webhook service.
 
-**What it does:**
-1. Clones the repository from GitHub
-2. Builds the Jekyll site using Docker
-3. Deploys to the specified nginx directory
-4. Logs all activity with timing breakdowns
+`deploy.sh` reconciles `_site/` directly to stable root keys in the private `cyberknight-corporate-site-production` R2 bucket. It serializes publication, uploads assets before HTML, deletes stale keys only after successful uploads, verifies the complete remote inventory and object metadata, writes `.manifest.json` last, and purges Cloudflare cache only after success.
 
-**Required parameters:**
-- `JEKYLL_DIR` - Temporary directory for cloning and building
-- `NGINX_DIR` - Target deployment directory for the built site
-- `JEKYLL_BUILDER_IMAGE` - Docker image containing Jekyll and dependencies
-
-**Example usage:**
 ```bash
-./server_build_script.sh \
-  JEKYLL_DIR=/path/to/build/directory \
-  NGINX_DIR=/path/to/nginx/deployment \
-  JEKYLL_BUILDER_IMAGE=cyberknight-council-template-builder
+./build_www.sh
+./build_www.sh --force-full
+./build_www.sh --dry-run
 ```
 
-**Webhook configuration:**
-The script is designed to work with webhook triggers. See the webhook JSON configuration in the repository for automated deployments on git push events.
+There is no active pointer, release directory, retained release, runtime S3 fallback, or automated rollback. Recovery is a corrected forced full deployment.
 
-**Logs:**
-Build logs are saved to `/path/to/logs/cyberknight-corporate-website/build_TIMESTAMP.log` (or `./logs/` if the main log directory is not writable).
+Credentials come from Doppler project `cyberknight-s3-sync`, config `prd`: `R2_ACCOUNT_ID`, bucket-scoped `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, and `CLOUDFLARE_API_TOKEN`. Never commit or print their values.
+
+`server_build_script.sh` is a deprecated NGINX-era compatibility artifact and is not the production webhook target.
 
 ## Content Guidelines
 

@@ -1,24 +1,19 @@
 #!/bin/bash
 
-# Build and deploy www.cyberknight-websites.com to S3 + Cloudflare
-# Usage: ./build_www.sh
-#
-# Credentials are injected via Doppler (cyberknight-s3-sync / prd).
-# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and CLOUDFLARE_API_TOKEN
-# must all be present in that Doppler project.
+# Build and deploy www.cyberknight-websites.com to R2 + Cloudflare.
+# Usage: ./build_www.sh [--force-full] [--dry-run]
+# Credentials are read by deploy.sh from Doppler (cyberknight-s3-sync / prd).
 
 JEKYLL_BUILDER_IMAGE="cyberknight-council-template-builder"
 REPO_URL="https://github.com/Cyberknight-Websites-Org/cyberknight-corporate-website.git"
-JEKYLL_DIR="/tmp/cyberknight-www-build"
+JEKYLL_DIR=""
 
-FORCE_FULL=false
+DEPLOY_ARGS=()
 for arg in "$@"; do
   case "$arg" in
-    --force-full)
-      FORCE_FULL=true
-      ;;
+    --force-full|--dry-run) DEPLOY_ARGS+=("$arg") ;;
     *)
-      echo "ERROR: Unknown argument '$arg'. Usage: $0 [--force-full]"
+      echo "ERROR: Unknown argument '$arg'. Usage: $0 [--force-full] [--dry-run]"
       exit 1
       ;;
   esac
@@ -51,26 +46,22 @@ START_TIME=$(get_timestamp)
 echo "=== Build started at $(date) ==="
 
 # ---------------------------------------------------------------------------
-# Doppler token
-# ---------------------------------------------------------------------------
-
-export DOPPLER_TOKEN="$(pass show cyberknight/s3-sync-doppler-token)"
-
-if [ -z "$DOPPLER_TOKEN" ]; then
-  echo "ERROR: Could not retrieve Doppler token from pass. Exiting."
-  exit 1
-fi
-
-# ---------------------------------------------------------------------------
 # Clone repository
 # ---------------------------------------------------------------------------
 
-STEP_START=$(get_timestamp)
-if [ -d "$JEKYLL_DIR" ]; then
-  rm -rf "$JEKYLL_DIR"
-fi
-mkdir -p "$JEKYLL_DIR"
+JEKYLL_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cyberknight-www-build.XXXXXX")" || {
+  echo "ERROR: Could not create build directory. Exiting."
+  exit 1
+}
+cleanup() {
+  status=$?
+  [ -z "$JEKYLL_DIR" ] || rm -rf -- "$JEKYLL_DIR"
+  trap - EXIT INT TERM
+  exit "$status"
+}
+trap cleanup EXIT INT TERM
 
+STEP_START=$(get_timestamp)
 echo "Cloning repository..."
 git clone --depth 1 "$REPO_URL" "$JEKYLL_DIR"
 if [ $? -ne 0 ]; then
@@ -102,16 +93,11 @@ if [ $DOCKER_EXIT_CODE -ne 0 ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Deploy to S3 + Cloudflare
+# Deploy to R2 + Cloudflare
 # ---------------------------------------------------------------------------
 
 STEP_START=$(get_timestamp)
-DEPLOY_ARGS=""
-if [ "$FORCE_FULL" = true ]; then
-  DEPLOY_ARGS="--force-full"
-fi
-
-./deploy.sh $DEPLOY_ARGS
+./deploy.sh "${DEPLOY_ARGS[@]}"
 if [ $? -ne 0 ]; then
   echo "ERROR: Deploy failed. Exiting."
   exit 1

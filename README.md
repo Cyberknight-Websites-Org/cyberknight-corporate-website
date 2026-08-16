@@ -1,62 +1,73 @@
 # cyberknight-corporate-website
 
-Corporate website for [Cyberknight Websites](https://cyberknight-websites.com), built with Jekyll and deployed to S3 + Cloudflare.
+Corporate website for [Cyberknight Websites](https://cyberknight-websites.com), built with Jekyll and deployed to a private Cloudflare R2 bucket.
 
 ## Local Development
 
 ```bash
 bundle install
 ./jekyll_serve_dev.sh
-# Site served at http://127.0.0.1:4000/
 ```
+
+The development site runs at `http://127.0.0.1:4000/`.
 
 ## Build and Deploy
 
-### `build_www.sh` — full pipeline (clone → build → deploy)
+### Full pipeline
 
-Intended for production use. Clones a fresh copy of the repository, builds the Jekyll site via Docker, and deploys to S3 with Cloudflare cache purge.
+`build_www.sh` clones a fresh copy, builds Jekyll through Docker, and invokes the R2 deployment:
 
 ```bash
 sudo ./build_www.sh
-```
-
-**Options:**
-- `--force-full` — skip the manifest diff and re-upload all files regardless of what changed
-
-```bash
 sudo ./build_www.sh --force-full
+sudo ./build_www.sh --dry-run
 ```
 
-**Requirements:** must be run as root. Requires Docker, the `cyberknight-council-template-builder` Docker image, and the `cyberknight/s3-sync-doppler-token` key in the root `pass` store.
+Each build uses a unique temporary directory. Publication is serialized separately so concurrent builds cannot interleave R2 mutations.
 
-Logs are written to `~/logs/cyberknight-www/build_TIMESTAMP.log` (or `./logs/` if that directory is not writable).
+### Deploy an existing build
 
----
-
-### `deploy.sh` — deploy only (no clone or build)
-
-Deploys an existing `_site/` directory to S3 using a manifest-based diff — only files that have changed since the last deploy are uploaded or deleted. Purges only the affected URLs from Cloudflare's cache.
+`deploy.sh` reconciles `_site/` directly to stable keys in the private `cyberknight-corporate-site-production` bucket:
 
 ```bash
 sudo ./deploy.sh
-```
-
-**Options:**
-- `--force-full` — skip the manifest diff and re-upload all files
-
-```bash
 sudo ./deploy.sh --force-full
+sudo ./deploy.sh --dry-run
 ```
 
-**Requirements:** must be run as root. Requires `aws`, `doppler`, `jq`, `sha256sum`, `curl`, `pass`, and `perl` in PATH, and the `cyberknight/s3-sync-doppler-token` key in the root `pass` store.
+The deployment:
 
-Logs are written to `~/logs/cyberknight-www/deploy_TIMESTAMP.log` (or `./logs/` if that directory is not writable).
+1. Validates a nonempty build containing `index.html`.
+2. Reads the actual remote inventory.
+3. Uploads non-HTML assets before HTML.
+4. Deletes stale objects only after uploads succeed.
+5. Verifies keys, sizes, content types, cache metadata, and SHA-256 metadata.
+6. Writes `.manifest.json` last.
+7. Purges Cloudflare cache only after successful verification.
 
----
+There is no `active.json`, release directory, retained release, or automated rollback. Recovery is a corrected forced full deployment.
+
+## Requirements
+
+- Docker and `cyberknight-council-template-builder`
+- AWS CLI, Doppler CLI, `jq`, `curl`, `pass`
+- `sha256sum` or `shasum`
+- `cyberknight/s3-sync-doppler-token` in the operator's `pass` store, unless `DOPPLER_TOKEN` is already supplied
+
+Doppler project `cyberknight-s3-sync`, config `prd`, supplies:
+
+- `R2_ACCOUNT_ID`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `CLOUDFLARE_API_TOKEN`
+
+The R2 credentials must be restricted to `cyberknight-corporate-site-production`.
 
 ## Infrastructure
 
-- **S3 bucket:** `cyberknight-websites`, folder `www/`
-- **Cloudflare zone:** `www.cyberknight-websites.com`
-- **Credentials:** managed via Doppler project `cyberknight-s3-sync`, config `prd`
-- **Manifest:** stored at `s3://cyberknight-websites/www/.manifest.json`
+- **R2 bucket:** `cyberknight-corporate-site-production`
+- **Layout:** generated site files at stable bucket-root keys
+- **Manifest:** `.manifest.json`
+- **Serving:** `www.cyberknight-websites.com` through the Sites Worker's `CORPORATE_R2` binding after cutover
+
+The bucket is private and has no `r2.dev` URL or custom domain.
