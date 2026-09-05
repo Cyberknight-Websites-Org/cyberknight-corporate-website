@@ -64,7 +64,7 @@ CLEANUP_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
 # Git clone
 echo "Cloning repository..."
 STEP_START=$(get_timestamp)
-git clone --depth 1 https://github.com/Cyberknight-Websites-Org/cyberknight-corporate-website.git $JEKYLL_DIR
+git clone --depth 1 https://git.cyberknight-websites.com/julianlopez/cyberknight-corporate-website.git $JEKYLL_DIR
 CLONE_TIME=$(perl -e "printf '%.2f', $(get_timestamp) - $STEP_START")
 
 cd $JEKYLL_DIR

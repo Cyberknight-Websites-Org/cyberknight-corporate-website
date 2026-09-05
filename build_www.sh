@@ -5,7 +5,7 @@
 # Credentials are read by deploy.sh from Doppler (cyberknight-s3-sync / prd).
 
 JEKYLL_BUILDER_IMAGE="cyberknight-council-template-builder"
-REPO_URL="https://github.com/Cyberknight-Websites-Org/cyberknight-corporate-website.git"
+REPO_URL="https://git.cyberknight-websites.com/julianlopez/cyberknight-corporate-website.git"
 JEKYLL_DIR=""
 
 DEPLOY_ARGS=()
@@ -63,7 +63,7 @@ trap cleanup EXIT INT TERM
 
 STEP_START=$(get_timestamp)
 echo "Cloning repository..."
-git clone --depth 1 "$REPO_URL" "$JEKYLL_DIR"
+GIT_TERMINAL_PROMPT=0 git clone --depth 1 "$REPO_URL" "$JEKYLL_DIR"
 if [ $? -ne 0 ]; then
   echo "ERROR: Git clone failed. Exiting."
   exit 1
